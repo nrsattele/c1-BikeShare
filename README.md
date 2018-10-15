@@ -2,6 +2,10 @@
 
 This is a submission for the 2019 Capital One Software Engineering Summit Challenge. LA bikeshare data was given and we were tasked with generating a webpage to visualize the data and display metrics covering average distance, bikesharing for commuting, and station popularity.
 
+## Getting Started
+
+Navigate to https://nrsattele.github.io/c1-BikeShare/
+
 ## To solve this challenge, build a web app that provides:
 
 [ ] Data Visuals: Display or graph 3 metrics or trends from the data set that are interesting to you.
@@ -15,10 +19,6 @@ This is a submission for the 2019 Capital One Software Engineering Summit Challe
 [ ] Is there a net change of bikes over the course of a day? If so, when and
 where should bikes be transported in order to make sure bikes match travel patterns?
 [ ] What is the breakdown of Trip Route Category-Passholder type combinations? What might make a particular combination more popular?
-
-## Getting Started
-
-Navigate to ...
 
 ## Authors
 
