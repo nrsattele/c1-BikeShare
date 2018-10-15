@@ -6,7 +6,7 @@ function getData(flag) {
         }
         console.log(response.text());
         var myData = document.getElementById('myData');
-        myData.innerText = response.text;
+        myData.innerText = response.text();
         return response.text();
     }).catch(function (status) {
         console.log('Error ' + status);
