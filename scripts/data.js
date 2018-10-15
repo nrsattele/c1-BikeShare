@@ -25,6 +25,6 @@ function httpGetAsync(theUrl, callback){
     xmlHttp.send(null);
 }
 
-function callback(respText) {
+function dispText(respText) {
     console.log(respText);
 }
