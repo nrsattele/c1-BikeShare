@@ -8,6 +8,8 @@ function getData(flag) {
         var myData = document.getElementById('myData');
         myData.innerText = response.text();
         return response.text();
+    }).then(function(data) {
+        console.log(data);
     }).catch(function (status) {
         console.log('Error ' + status);
     });
