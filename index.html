@@ -6,13 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
 
-    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="styles/style-main.css">
     <script src="scripts/data.js"></script>
 </head>
 
 <body>
+    <div class="map">
+        <iframe class="iframe map" src="map.html"></iframe>
+    </div>
+
+    <div class="charts">
+        <iframe class="iframe charts" src="chart.html"></iframe>
+    </div>
+
+    <!-- <table id="popularity">
+        <tr>
+            <th>Rank</th>
+            <th>ID</th>
+            <th>Frequency</th>
+        </tr>
+    </table>
     <form>
-        <a onclick="httpGetAsync('data/metro-bike-share-trip-data.csv', 'dispText')">Submit </a>
+        <a onclick="getData('https://nrsattele.github.io/c1-BikeShare/data/metro-bike-share-trip-data.csv')">Submit </a>
         <p id="myData"></p>
-    </form>
+    </form> -->
 </body>

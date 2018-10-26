@@ -1,0 +1,25 @@
+.iframe.map {
+    display: block;
+    position: absolute;
+    width:100%;
+    height:80%;
+    border:none;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+}
+.iframe.charts {
+    position:absolute;
+    display: block;
+    width:100%;
+    height:90%;
+    min-height: 150px;
+    border:none;
+    bottom:0;
+    top: 80%;
+    z-index: 1;
+}
+
+div {
+    display: block;
+}

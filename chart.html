@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script type="text/javascript">
+
+        window.onload = function () {
+            var myData = []
+
+            // Gets preprocessed data
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    processTrafficData(xmlHttp.responseText)
+                    processTimeData(xmlHttp.responseText)
+                }
+            }
+            xmlHttp.open("GET", 'https://nrsattele.github.io/c1-BikeShare/data/preprocessed.csv', true);
+            xmlHttp.send(null);
+
+            // Gets real data
+            var xmlHttp2 = new XMLHttpRequest();
+            xmlHttp2.onreadystatechange = function () {
+                if (xmlHttp2.readyState == 4 && xmlHttp2.status == 200) {
+                    renderTimeOfDayGraph(xmlHttp2.responseText)
+                }
+            }
+            xmlHttp2.open("GET", 'https://nrsattele.github.io/c1-BikeShare/data/metro-bike-share-trip-data.csv', true);
+            xmlHttp2.send(null);
+        }
+
+        function processTrafficData(data) {
+            // Splits data by row and extracts headers
+            var elements = data.split("\n");
+            var headers = elements[0].split(",");
+            var answer = [];
+
+            // Loops through each element of the line and makes it an object, then adds it to answer[]
+            // Only want ID, incoming count, and leaving count
+            for (let i = 1; i < elements.length; i++) {
+                var thisLine = elements[i].split(",");
+                var thisObj = {
+                    label: thisLine[0],
+                    y: parseInt(thisLine[1]) + parseInt(thisLine[2])
+                };
+                answer.push(thisObj)
+            }
+            renderChart("Total Uses by Station", answer)
+        }
+
+        function processTimeData(data) {
+            // Splits data by row and extracts headers
+            var elements = data.split("\n");
+            var headers = elements[0].split(",");
+            var answer = [];
+
+            // Loops through each element of the line and makes it an object, then adds it to answer[]
+            // Only want ID, incoming count, and leaving count
+            for (let i = 1; i < elements.length; i++) {
+                var thisLine = elements[i].split(",");
+                var thisObj = {
+                    label: thisLine[0],
+                    y: parseInt(thisLine[2])
+                };
+                answer.push(thisObj)
+            }
+            renderChart("Average Trip Time By Station", answer)
+        }
+
+        function renderChart(title, myData) {
+            var chart = new CanvasJS.Chart(title, {
+                title: {
+                    text: title
+                },
+                data: [
+                    {
+                        type: "column",
+                        dataPoints: myData
+                    }
+                ]
+            });
+            chart.render();
+        }
+
+        function renderTimeOfDayGraph(data) {
+            // Splits data by row and extracts headers
+            var elements = data.split("\n");
+            var headers = elements[0].split(",");
+            var flexPass = [];
+            var monthlyPass = [];
+            var walkUp = [];
+
+            // Loops through each element of the line and makes it an object, then adds it to arrData[]
+            for (let i = 1; i < elements.length; i++) {
+                var thisLine = elements[i].split(",");
+                if (thisLine[13] === "Monthly Pass") {
+                    monthlyPass.push(thisLine[2])
+                } else if (thisLine[13] === "Flex Pass") {
+                    flexPass.push(thisLine[2])
+                } else {
+                    walkUp.push(thisLine[2])
+                }
+            }
+
+            //Histogram formatted data
+            var flexPassData = [];
+            var monthlyPassData = [];
+            var walkUpData = [];
+            for (let i = 0; i < 24; i++) {
+                var d = new Date(0)
+                d.setHours(i)
+                flexPassData.push({
+                    x: d,
+                    y: 0
+                });
+                monthlyPassData.push({
+                    x: d,
+                    y: 0
+                });
+                walkUpData.push({
+                    x: d,
+                    y: 0
+                });
+            }
+
+            for (let i = 0; i < flexPass.length; i++) {
+                var d = new Date(flexPass[i])
+                flexPassData[d.getHours()].y++;
+            }
+            for (let i = 0; i < monthlyPass.length; i++) {
+                var d = new Date(monthlyPass[i])
+                monthlyPassData[d.getHours()].y++;
+            }
+            for (let i = 0; i < walkUp.length - 1; i++) {
+                var d = new Date(walkUp[i])
+                walkUpData[d.getHours()].y++;
+            }
+
+            var chart = new CanvasJS.Chart("Station Useage", {
+                animationEnabled: true,
+                title: {
+                    text: "Average Rideshare Traffic"
+                },
+                axisX: {
+                    title: "Time"
+                },
+                axisY: {
+                    title: "Number of Rides"
+                },
+                data: [
+                {
+                        type: "stackedArea",
+                        showInLegend: true,
+                        name: "Flex Passholders n=" + flexPass.length,
+                        xValueType: "dateTime",
+                        xValueFormatString: "hh:mm TT",
+                        yValueFormatString: "#,###",
+                        dataPoints: flexPassData
+                    },
+                    {
+                        type: "stackedArea",
+                        showInLegend: true,
+                        name: "Walk Ups n=" + walkUp.length,
+                        xValueType: "dateTime",
+                        xValueFormatString: "hh:mm TT",
+                        yValueFormatString: "#,###",
+                        dataPoints: walkUpData
+                    },
+                    {
+                        type: "stackedArea",
+                        showInLegend: true,
+                        name: "Monthly Passholders n=" + monthlyPass.length,
+                        xValueType: "dateTime",
+                        xValueFormatString: "hh:mm TT",
+                        yValueFormatString: "#,###",
+                        dataPoints: monthlyPassData
+                    },
+                ]
+            });
+            chart.render();
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="Average Trip Time By Station" style="height: 300px; width: 100%;"></div>
+    <div id="Total Uses by Station" style="height: 300px; width: 100%;"></div>
+    <div id="Station Useage" style="height: 300px; width: 100%;"></div>
+</body>
+
+</html>

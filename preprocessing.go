@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var data = make(map[string]Station)
@@ -55,7 +56,7 @@ func main() {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	headers := []string{"stationID", "incoming", "leaving", "avgTimeSpent", "percentRoundTrip", "percentPassholder", "latitude", "longitude"}
+	headers := []string{"stationID", "incoming", "leaving", "avgTimeSpent", "percentRoundTrip", "percentPassholder", "latitude", "longitude", "averageTimeUsed"}
 
 	err = writer.Write(headers)
 	if err != nil {
@@ -71,7 +72,7 @@ func main() {
 
 	for _, key := range keys {
 		station := data[key]
-		s := []string{station.stationID, fmt.Sprintf("%v", station.incoming), fmt.Sprintf("%v", station.leaving), fmt.Sprintf("%f", station.avgTimeSpent), fmt.Sprintf("%f", station.percentRoundTrip), fmt.Sprintf("%f", station.percentPassholder), station.stationLatitude, station.stationLongitude}
+		s := []string{station.stationID, fmt.Sprintf("%v", station.incoming), fmt.Sprintf("%v", station.leaving), fmt.Sprintf("%f", station.avgTimeSpent), fmt.Sprintf("%f", station.percentRoundTrip), fmt.Sprintf("%f", station.percentPassholder), station.stationLatitude, station.stationLongitude, fmt.Sprintf("%v", station.avgTimeUsed)}
 		err := writer.Write(s)
 		if err != nil {
 			log.Fatal("Cannot wrtie to file", err)
@@ -179,6 +180,24 @@ func analyze(fields []string, analyzeStarting bool) {
 			}
 		}
 
+		// Average Time the station is interacted at
+		avgTime := station.avgTimeUsed * float64(station.incoming+station.leaving)
+		if analyzeStarting {
+			t, err := time.Parse(time.RFC3339, (fields[2] + "Z"))
+			if err != nil {
+				log.Fatal("Cannot convert " + fields[2] + " to a time")
+			}
+			avgTime += float64(t.Hour()*60 + t.Minute())
+		} else {
+			t, err := time.Parse(time.RFC3339, (fields[3] + "Z"))
+			if err != nil {
+				log.Fatal("Cannot convert " + fields[3] + " to a time")
+			}
+			avgTime += float64(t.Hour()*60 + t.Minute())
+		}
+		station.avgTimeUsed = avgTime / float64(station.incoming+station.leaving+1)
+
+		// Updates Station
 		data[station.stationID] = station
 	} else {
 		//Creates new station
@@ -200,18 +219,29 @@ func analyze(fields []string, analyzeStarting bool) {
 		id := ""
 		lat := ""
 		lon := ""
+		timeUsed := 0.0
 		if analyzeStarting {
 			out = 1
 			in = 0
 			id = fields[4]
 			lat = fields[5]
 			lon = fields[6]
+			t, err := time.Parse(time.RFC3339Nano, (fields[2] + "Z"))
+			if err != nil {
+				log.Fatal("Cannot convert " + fields[2] + " to a time\n" + err.Error())
+			}
+			timeUsed = float64(t.Hour()*60 + t.Minute())
 		} else {
 			out = 0
 			in = 1
 			id = fields[7]
 			lat = fields[8]
 			lon = fields[9]
+			t, err := time.Parse(time.RFC3339Nano, (fields[3] + "Z"))
+			if err != nil {
+				log.Fatal("Cannot convert " + fields[3] + " to a time\n" + err.Error())
+			}
+			timeUsed = float64(t.Hour()*60 + t.Minute())
 		}
 
 		station := Station{
@@ -223,6 +253,7 @@ func analyze(fields []string, analyzeStarting bool) {
 			percentPassholder: pPass,
 			stationLatitude:   lat,
 			stationLongitude:  lon,
+			avgTimeUsed:       timeUsed,
 		}
 
 		data[station.stationID] = station
@@ -234,13 +265,12 @@ type Station struct {
 	stationID         string
 	incoming          int
 	leaving           int
-	avgTimeSpent      float64
+	avgTimeSpent      float64 // Stores the average trip time for users of this station
 	percentRoundTrip  float64
 	percentPassholder float64
 	stationLatitude   string
 	stationLongitude  string
-	//Average time bikes are taken from station
-	//avgTimeOfDay time.Time
+	avgTimeUsed       float64 // Stores the average time of day this station has been used
 }
 
 // GeoJSON Comment
@@ -251,7 +281,11 @@ type GeoJSON struct {
 
 // Feature Comment
 type Feature struct {
-	Type       string `json:"type"`
+	Type     string `json:"type"`
+	Geometry struct {
+		Type        string    `json:"type"`
+		Coordinates []float64 `json:"coordinates"`
+	} `json:"geometry"`
 	Properties struct {
 		Name              string  `json:"name"`
 		Incoming          int     `json:"incoming"`
@@ -260,10 +294,6 @@ type Feature struct {
 		PercentRoundTrip  float64 `json:"percentRoundTrip"`
 		PercentPassholder float64 `json:"percentPassholder"`
 	} `json:"properties"`
-	Geometry struct {
-		Type        string    `json:"type"`
-		Coordinates []float64 `json:"coordinates"`
-	} `json:"geometry"`
 }
 
 // Constructor Comment
