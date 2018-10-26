@@ -4,7 +4,7 @@ This is a submission for the 2019 Capital One Software Engineering Summit Challe
 
 ## Getting Started
 
-Navigate to https://nrsattele.github.io/c1-BikeShare/
+Navigate to https://nrsattele.github.io/c1-BikeShare/index.html
 
 ## To solve this challenge, build a web app that provides:
 
