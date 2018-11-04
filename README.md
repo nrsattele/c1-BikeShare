@@ -8,16 +8,16 @@ Navigate to https://nrsattele.github.io/c1-BikeShare/index.html
 
 ## To solve this challenge, build a web app that provides:
 
-[x] Data Visuals: Display or graph 3 metrics or trends from the data set that are interesting to you.
-[x] Which start/stop stations are most popular?
-[x] What is the average distance traveled?
-[x] How many riders include bike sharing as a regular part of their commute?
+[x] Data Visuals: Display or graph 3 metrics or trends from the data set that are interesting to you.  
+[x] Which start/stop stations are most popular?  
+[x] What is the average distance traveled?  
+[x] How many riders include bike sharing as a regular part of their commute?  
 
 ### Optional Bonus Features:
 
-[ ] How does ridership change with seasons? Types of passes used, trip duration, etc
-[x] Is there a net change of bikes over the course of a day? If so, when and where should bikes be transported in order to make sure bikes match travel patterns?
-[x] What is the breakdown of Trip Route Category-Passholder type combinations? What might make a particular combination more popular?
+[ ] How does ridership change with seasons? Types of passes used, trip duration, etc  
+[x] Is there a net change of bikes over the course of a day? If so, when and where should bikes be transported in order to make sure bikes match travel patterns?  
+[x] What is the breakdown of Trip Route Category-Passholder type combinations? What might make a particular combination more popular?  
 
 ## Authors
 
